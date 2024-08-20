@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Code Editor with Problem Description</title>
+    
+    <!-- Basic styling for the page -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            display: flex;
+            width: 100%; /* Use full screen width */
+            max-width: 100%; /* Ensure it covers the full screen */
+        }
+        .left-panel, .right-panel {
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .left-panel {
+            width: 40%; /* 40% width for the description panel */
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 85vh; /* Ensure it doesn't take more than 85% of viewport height */
+        }
+        .right-panel {
+            width: 60%; /* 60% width for the editor panel */
+            display: flex;
+            flex-direction: column;
+        }
+        pre {
+            background-color: #2e2e2e;
+            color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: "Courier New", Courier, monospace;
+        }
+        #editor {
+            flex-grow: 1;
+            height: 500px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #runButton {
+            padding: 10px 20px;
+            background-color: #007acc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 10px;
+            align-self: flex-start; /* Align button to the start of the right panel */
+        }
+        #output {
+            margin-top: 20px;
+            background-color: #2e2e2e;
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 16px;
+            white-space: pre-line;
+            overflow-y: auto;
+            height: 200px;
+            border: 1px solid #444444;
+            flex-grow: 1;
+        }
+    </style>
+
+    <!-- Prism.js CSS for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+</head>
+<body>
+
+    <div class="container">
+        <!-- Left panel for the task description -->
+        <div class="left-panel">
+            <h2>Task Description</h2>
+            <div id="markdown-content">
+                Loading problem description...
+            </div>
+        </div>
+
+        <!-- Right panel for the editor and output -->
+        <div class="right-panel">
+            <div id="editor"></div>
+            <button id="runButton" onclick="executeCode()">Run Code</button>
+            <div id="output">Output will appear here...</div>
+        </div>
+    </div>
+
+    <!-- Showdown JS for Markdown conversion -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+    <!-- Monaco Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.40.0/min/vs/loader.min.js"></script>
+
+    <script>
+        // Extract the filename from the Flask template
+        const filename = "{{ filename }}";
+
+        // Fetch and render the Markdown content
+        fetch(`/static/${filename}.md`)
+        .then(response => response.text())
+        .then(text => {
+            // Convert markdown to HTML
+            const converter = new showdown.Converter();
+            const html = converter.makeHtml(text);
+            // Insert the converted HTML into the page
+            document.getElementById('markdown-content').innerHTML = html;
+            // Apply Prism.js syntax highlighting
+            Prism.highlightAll();
+        })
+        .catch(error => {
+            console.error('Error loading markdown:', error);
+            document.getElementById('markdown-content').textContent = 'Failed to load content.';
+        });
+
+        // Fetch and load the Python code into the Monaco Editor
+        fetch(`/static/${filename}.py`)
+        .then(response => response.text())
+        .then(code => {
+            // Initialize Monaco Editor with the fetched code
+            require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.40.0/min/vs' }});
+            require(['vs/editor/editor.main'], function () {
+                window.editor = monaco.editor.create(document.getElementById('editor'), {
+                    value: code,
+                    language: 'python',
+                    theme: 'vs-light', // Use light theme for Monaco Editor
+                    automaticLayout: true
+                });
+            });
+        })
+        .catch(error => {
+            console.error('Error loading Python code:', error);
+        });
+
+        // Function to execute code
+        function executeCode() {
+            const code = editor.getValue();
+            fetch('/execute', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code: code })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Replace the output div's text content with the result
+                document.getElementById('output').textContent = data.output;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('output').textContent = 'Error executing code.';
+            });
+        }
+    </script>
+
+</body>
+</html>
