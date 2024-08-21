@@ -61,7 +61,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ### Contact
 
 If you have any questions or need further assistance, feel free to contact me through the issue tracker or via email at jakub.zalewski93@gmail.com.
-
----
-
-This README provides a comprehensive overview of the Python Interview Task Platform, including instructions for adding custom tasks, running the application locally with Docker, and accessing the working demo.
