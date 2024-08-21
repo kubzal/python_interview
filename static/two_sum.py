@@ -1,13 +1,7 @@
 def two_sum(nums, target):
-    num_map = {}  # To store the value and its index
-    
-    for i, num in enumerate(nums):
-        complement = target - num
-        if complement in num_map:
-            return [num_map[complement], i]
-        num_map[num] = i
+    # your code here
 
-# Example usage
+# Test cases
 nums = [2, 7, 11, 15]
 target = 9
-print(two_sum(nums, target))
+print(two_sum(nums, target)) # Output: [0, 1]
