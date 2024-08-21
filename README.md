@@ -26,7 +26,7 @@ To run the platform locally using Docker:
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/kubzal/python-interview-platform.git
+    git clone https://github.com/kubzal/python_interview.git
     cd python-interview-platform
     ```
 
