@@ -1,9 +1,6 @@
-.venv
-old
-
-# Ignore everything in the directory
+.*
+!.gitignore
 static/*
-
-# Unignore specific files
 !static/two_sum.md
 !static/two_sum.py
+old
