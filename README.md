@@ -8,6 +8,7 @@ This repository contains a Flask-based platform for running and testing Python i
 - **Code Execution with Timeout**: Python code execution is limited to 30 seconds to prevent long-running tasks.
 - **Security**: Restricts access to external URLs and certain built-in functions to ensure the safe execution of user code.
 - **Dockerized**: Easily deploy the application using Docker.
+- **Broadcast Messages**: Send pop-up messages to all users who have the app open via a dedicated endpoint.
 
 ### Getting Started
 
@@ -48,6 +49,15 @@ To run the platform locally using Docker:
 4. Access the platform in your browser at `http://localhost:5000/`.
 
 Replace `"your_secret_key_here"` and `"your_message_password_here"` with your desired values for the secret key and message password.
+
+#### Sending Broadcast Messages
+
+The platform includes a tool that allows administrators to send pop-up messages to all users who have the app open. This can be accessed via the `/send_message_form` endpoint.
+
+- Navigate to `http://localhost:5000/send_message_form` to access the form.
+- Enter the message you wish to broadcast, and if desired, include a URL and hyperlink text.
+- Validate the message with the password defined in the `MESSAGE_PASSWORD` environment variable.
+- Once sent, the message will pop up for all users currently viewing the platform.
 
 #### Example Task
 
