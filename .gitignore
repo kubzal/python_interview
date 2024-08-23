@@ -1,6 +1,6 @@
 .*
 !.gitignore
-static/*
-!static/two_sum.md
-!static/two_sum.py
+tasks/*
+!tasks/two_sum.md
+!tasks/two_sum.py
 old
