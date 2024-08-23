@@ -15,8 +15,8 @@ This repository contains a Flask-based platform for running and testing Python i
 
 To add a new task:
 
-1. Place your Markdown file (e.g., `custom_task.md`) containing the problem description in the `static` directory.
-2. Place the corresponding Python code file (e.g., `custom_task.py`) in the `static` directory.
+1. Place your Markdown file (e.g., `custom_task.md`) containing the problem description in the `tasks` directory.
+2. Place the corresponding Python code file (e.g., `custom_task.py`) in the `tasks` directory.
 3. Access the task by navigating to `http://localhost:5000/custom_task` after starting the Flask app.
 
 #### Running the Application Locally with Docker
@@ -36,13 +36,18 @@ To run the platform locally using Docker:
     docker build -t python_interview .
     ```
 
-3. Run the Docker container:
+3. Run the Docker container with environment variables for `SECRET_KEY` and `MESSAGE_PASSWORD`:
 
     ```bash
-    docker run -d -p 5000:5000 --name python_interview python_interview
+    docker run -d -p 5000:5000 --name python_interview \
+    -e SECRET_KEY="your_secret_key_here" \
+    -e MESSAGE_PASSWORD="your_message_password_here" \
+    python_interview
     ```
 
 4. Access the platform in your browser at `http://localhost:5000/`.
+
+Replace `"your_secret_key_here"` and `"your_message_password_here"` with your desired values for the secret key and message password.
 
 #### Example Task
 
