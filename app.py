@@ -1,25 +1,28 @@
+import builtins
+import os
+import re
+import subprocess
+import sys
+import tempfile
+
 from flask import (
     Flask,
-    request,
-    jsonify,
-    render_template,
-    redirect,
-    url_for,
-    flash,
     abort,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
     send_from_directory,
+    url_for,
 )
 from flask_socketio import SocketIO, emit
-import subprocess
-import tempfile
-import os
-import sys
-import builtins
-import re
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
-socketio = SocketIO(app, cors_allowed_origins="*")  # Allow CORS for testing on different devices
+socketio = SocketIO(
+    app, cors_allowed_origins="*"
+)  # Allow CORS for testing on different devices
 
 
 # Function to validate URLs
@@ -59,10 +62,11 @@ def index():
 def default():
     return render_template("default.html")
 
+
 # Serve files from the tasks directory
-@app.route('/tasks/<path:filename>')
+@app.route("/tasks/<path:filename>")
 def serve_task_file(filename):
-    return send_from_directory('tasks', filename)
+    return send_from_directory("tasks", filename)
 
 
 @app.route("/<endpoint_name>")
@@ -109,21 +113,21 @@ def execute():
         return jsonify({"output": f"Error: {str(e)}"})
 
 
-@app.route('/send_message_form', methods=['GET', 'POST'])
+@app.route("/send_message_form", methods=["GET", "POST"])
 def send_message_form():
-    if request.method == 'POST':
-        message = request.form.get('message', '')
-        url = request.form.get('url', '')
-        link_text = request.form.get('link_text', '')
-        password = request.form.get('password', '')
+    if request.method == "POST":
+        message = request.form.get("message", "")
+        url = request.form.get("url", "")
+        link_text = request.form.get("link_text", "")
+        password = request.form.get("password", "")
 
-        if password != os.environ.get('MESSAGE_PASSWORD', 'Dupa123'):
-            flash('Invalid password. Please try again.', 'danger')
-            return redirect(url_for('send_message_form'))
+        if password != os.environ.get("MESSAGE_PASSWORD", "Dupa123"):
+            flash("Invalid password. Please try again.", "danger")
+            return redirect(url_for("send_message_form"))
 
         if url and not is_valid_url(url):
-            flash('Invalid URL. Please enter a valid URL.', 'danger')
-            return redirect(url_for('send_message_form'))
+            flash("Invalid URL. Please enter a valid URL.", "danger")
+            return redirect(url_for("send_message_form"))
 
         if url and link_text:
             message_to_send = f'{message} <a href="{url}">{link_text}</a>'
@@ -132,13 +136,13 @@ def send_message_form():
 
         # Emit the message to all connected clients
         print(f"Emitting message: {message_to_send}")
-        socketio.emit('new_message', {'message': message_to_send})
+        socketio.emit("new_message", {"message": message_to_send})
 
-        flash('Message sent successfully!', 'success')
-        return redirect(url_for('send_message_form'))
+        flash("Message sent successfully!", "success")
+        return redirect(url_for("send_message_form"))
 
-    return render_template('send_message.html')
+    return render_template("send_message.html")
 
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True, host="0.0.0.0", port=5000)
+    socketio.run(app, allow_unsafe_werkzeug=True, debug=True, host="0.0.0.0", port=5000)
